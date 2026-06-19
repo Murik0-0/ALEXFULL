@@ -30,7 +30,7 @@ function Footer() {
           </a>
 
           <span>
-            📍 г. Люберцы
+            📍 г. Балашиха
           </span>
 
         </div>

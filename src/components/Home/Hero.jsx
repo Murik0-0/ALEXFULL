@@ -49,13 +49,14 @@ function Hero() {
             Рассчитать стоимость 
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </Link>
-          
+          {/*
           <a href="https://www.tiktok.com/@alexfull777" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-gray-300 hover:text-white transition-colors group">
             <div className="w-12 h-12 rounded-full border border-gray-500 flex items-center justify-center group-hover:border-accentPurple group-hover:text-accentPurple transition-all">
               <Play size={20} fill="currentColor" />
             </div>
             <span className="text-sm font-medium">Посмотреть видео о нас</span>
           </a>
+          */}
         </div>
       </div>
 
