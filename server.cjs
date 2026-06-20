@@ -63,7 +63,6 @@ app.post('/api/delete-lead', (req, res) => {
 });
 
 const PORT = 5002;
-app.listen(PORT, () => {
-  console.log(`Сервер админки запущен на http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Сервер админки запущен на http://0.0.0.0:${PORT}`);
 });
-
