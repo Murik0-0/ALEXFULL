@@ -13,7 +13,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="calc" element={<CalcPage />} />
-          <Route path="/alexfull-secret-admin" element={<AdminPanel />} />
+          <Route path="/admin" element={<AdminPanel />} />
         </Route>
       </Routes>
     </Router>
