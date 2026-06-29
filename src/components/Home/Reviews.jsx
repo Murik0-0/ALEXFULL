@@ -26,7 +26,7 @@ function Reviews() {
 
   // 2. Загрузка данных
   useEffect(() => {
-    fetch('/data/reviews.json')
+    fetch('/api/data/reviews.json')
       .then(response => response.json())
       .then(data => {
         setReviewsData(data);

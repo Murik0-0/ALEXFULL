@@ -35,14 +35,14 @@ function CalcPage() {
   const [isSending, setIsSending] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
 
-  // Загружаем конфигурации из public/data
+  // ИСПРАВЛЕНО: Загружаем конфигурации из /api/data вместо статического /data
   useEffect(() => {
     Promise.all([
-      fetch('/data/calcStepsData.json').then(res => res.json()),
-      fetch('/data/servicesPrice.json').then(res => res.json()),
-      fetch('/data/packagingPrice.json').then(res => res.json()),
-      fetch('/data/markingPrice.json').then(res => res.json()),
-      fetch('/data/extraPrice.json').then(res => res.json())
+      fetch('/api/data/calcStepsData.json').then(res => res.json()),
+      fetch('/api/data/servicesPrice.json').then(res => res.json()),
+      fetch('/api/data/packagingPrice.json').then(res => res.json()),
+      fetch('/api/data/markingPrice.json').then(res => res.json()),
+      fetch('/api/data/extraPrice.json').then(res => res.json())
     ]).then(([steps, serv, pack, mark, ext]) => {
       setConfig(steps);
       setServices(serv);
@@ -133,7 +133,8 @@ function CalcPage() {
     try {
       let currentLeads = [];
       try {
-        const checkRes = await fetch('/data/leadsData.json');
+        // ИСПРАВЛЕНО: Читаем существующие лиды через API бэкенда
+        const checkRes = await fetch('/api/data/leadsData.json');
         currentLeads = await checkRes.json();
       } catch (e) {
         currentLeads = [];
@@ -141,7 +142,8 @@ function CalcPage() {
 
       currentLeads.push(fullLeadData);
 
-      const saveResponse = await fetch('http://localhost:5002/api/save-json', {
+      // ИСПРАВЛЕНО: Убран localhost:5002. Теперь путь относительный, чтобы запросы на проде шли куда нужно
+      const saveResponse = await fetch('/api/save-json', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: 'leadsData.json', data: currentLeads })
@@ -149,14 +151,14 @@ function CalcPage() {
 
       const resData = await saveResponse.json();
       if (resData.success) {
-        setStatusMsg('Расчет успешно сохранен! Перенаправляем на админку...');
+        setStatusMsg('Расчет успешно сохранен!');
         setClientData({ name: '', phone: '', comment: '' });
         setCurrentStep(1); // сброс на первый шаг
       } else {
         setStatusMsg('Ошибка записи данных на сервере');
       }
     } catch (err) {
-      setStatusMsg('Ошибка отправки. Убедитесь, что запущен локальный сервер Node.js');
+      setStatusMsg('Ошибка отправки. Убедитесь, что сервер бэкенда запущен');
     } finally {
       setIsSending(false);
     }
@@ -301,7 +303,7 @@ function CalcPage() {
               </div>
             )}
 
-            {/* ШАГ 4: Складские услуги (Множественный чекбокс) */}
+            {/* ШАГ 4: Складские услуги */}
             {currentStep === 4 && (
               <div className="space-y-4">
                 <h2 className="text-white font-bold text-lg">Какие базовые услуги фулфилмента требуются?</h2>
@@ -329,7 +331,7 @@ function CalcPage() {
               </div>
             )}
 
-            {/* ШАГ 5: Тип упаковки (Радиокнопки) */}
+            {/* ШАГ 5: Тип упаковки */}
             {currentStep === 5 && (
               <div className="space-y-4">
                 <h2 className="text-white font-bold text-lg">Выберите формат индивидуальной упаковки</h2>
@@ -358,7 +360,7 @@ function CalcPage() {
               </div>
             )}
 
-            {/* ШАГ 6: Финал (Маркировка, логистика, контакты и Итого) */}
+            {/* ШАГ 6: Финал */}
             {currentStep === 6 && (
               <div className="space-y-6">
                 <div>
@@ -411,7 +413,7 @@ function CalcPage() {
 
                 <hr className="border-[#252538]/40" />
 
-                {/* Живой расчет сметы на финальном шаге */}
+                {/* Расчёт сметы */}
                 <div className="p-4 rounded-xl bg-purple-600/5 border border-purple-500/20 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                   <div>
                     <span className="text-gray-500 text-[10px] font-bold uppercase tracking-wider">Предварительный расчёт сметы:</span>
@@ -437,7 +439,7 @@ function CalcPage() {
 
           </div>
 
-          {/* НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ (КНОПКИ НАЗАД / ДАЛЕЕ) */}
+          {/* НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ */}
           <div className="mt-8 pt-4 border-t border-[#252538]/40 flex justify-between items-center">
             <button
               onClick={() => setCurrentStep(prev => Math.max(prev - 1, 1))}

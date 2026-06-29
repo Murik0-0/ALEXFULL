@@ -7,7 +7,7 @@ function WeeklyDiscounts() {
 
   useEffect(() => {
     // Загружаем данные из JSON файла
-    fetch('/data/discounts.json')
+    fetch('/api/data/discounts.json')
       .then(response => response.json())
       .then(data => {
         setDiscountsData(data.discounts);

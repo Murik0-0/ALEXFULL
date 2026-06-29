@@ -16,7 +16,7 @@ function NewsSection() {
 
   useEffect(() => {
     // Загружаем данные из правильного JSON-файла новостей
-    fetch('/data/news.json')
+    fetch('/api/data/news.json')
       .then(response => {
         if (!response.ok) {
           throw new Error('Ошибка загрузки файла новостей');

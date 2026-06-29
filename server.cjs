@@ -7,10 +7,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Путь к папке public
+// Путь к папке с живыми данными внутри бэкенда
 const PUBLIC_DIR = path.join(__dirname, 'public', 'data');
 
-// Эндпоинт для сохранения JSON
+// МЕГА-ВАЖНО: Открываем доступ на чтение файлов из папки бэкенда
+// Теперь любой, кто перейдет по /api/data/news.json, получит живой файл!
+app.use('/api/data', express.static(PUBLIC_DIR));
+
+// Эндпоинт для сохранения JSON из админки
 app.post('/api/save-json', (req, res ) => {
   const { filename, data } = req.body;
   
@@ -29,9 +33,10 @@ app.post('/api/save-json', (req, res ) => {
   });
 });
 
+// Эндпоинт для удаления заявки
 app.post('/api/delete-lead', (req, res) => {
   const { id } = req.body;
-  const filePath = path.join(__dirname, 'public', 'data', 'leadsData.json'); // Проверь путь к папке public
+  const filePath = path.join(PUBLIC_DIR, 'leadsData.json'); 
 
   if (!id) {
     return res.status(400).json({ success: false, message: 'Не указан ID заявки' });
@@ -46,10 +51,8 @@ app.post('/api/delete-lead', (req, res) => {
       let leads = JSON.parse(data);
       if (!Array.isArray(leads)) leads = [];
 
-      // Фильтруем массив, исключая заявку с указанным ID
       const filteredLeads = leads.filter(lead => lead.id !== id);
 
-      // Записываем обновленный массив обратно в файл
       fs.writeFile(filePath, JSON.stringify(filteredLeads, null, 2), 'utf8', (writeErr) => {
         if (writeErr) {
           return res.status(500).json({ success: false, message: 'Ошибка записи в файл' });

@@ -42,25 +42,25 @@ function AdminPanel() {
   };
 
   // Загрузка выбранного JSON файла из папки public
+// 1. Исправленная загрузка контента файлов
   const loadFileContent = async (filename) => {
     try {
-      const response = await fetch(`/data/${filename}?t=${Date.now()}`);
+      const response = await fetch(`/api/data/${filename}?t=${Date.now()}`);
       const data = await response.json();
       setJsonContent(JSON.stringify(data, null, 2));
       showStatus('Файл успешно загружен', 'success');
     } catch (err) {
-      showStatus('Ошибка загрузки файла. Проверь, что он есть в public/', 'error');
+      showStatus('Ошибка загрузки файла сервера', 'error');
     }
   };
 
-  // Загрузка обращений клиентов из калькулятора
+  // 2. Исправленная загрузка обращений клиентов
   const loadLeadsData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/data/leadsData.json?t=${Date.now()}`);
+      const response = await fetch(`/api/data/leadsData.json?t=${Date.now()}`);
       const data = await response.json();
       if (Array.isArray(data)) {
-        // Сортируем: свежие заявки по ID (таймстампу) будут в самом верху
         setLeads(data.sort((a, b) => b.id - a.id));
       } else {
         setLeads([]);
@@ -72,14 +72,12 @@ function AdminPanel() {
     }
   };
 
-  // Удаление лида по ID из файла и из стейта
+  // 3. Исправленное удаление лида (убрали localhost:5002)
   const handleDeleteLead = async (leadId) => {
-    if (!window.confirm('Вы уверены, что хотите удалить эту заявку? Действие нельзя будет отменить.')) {
-      return;
-    }
+    if (!window.confirm('Вы уверены, что хотите удалить эту заявку?')) return;
 
     try {
-      const response = await fetch('http://localhost:5002/api/delete-lead', {
+      const response = await fetch('/api/delete-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: leadId }),
@@ -87,34 +85,22 @@ function AdminPanel() {
 
       const result = await response.json();
       if (result.success) {
-        // Мгновенно убираем из интерфейса
         setLeads(prevLeads => prevLeads.filter(lead => lead.id !== leadId));
         showStatus('Заявка успешно удалена', 'success');
       } else {
-        showStatus('Ошибка сервера при удалении заявки', 'error');
+        showStatus('Ошибка сервера при удалении', 'error');
       }
     } catch (err) {
-      showStatus('Не удалось связаться с сервером для удаления', 'error');
+      showStatus('Не удалось связаться с сервером', 'error');
     }
   };
 
-  // Отслеживание переключений файлов и вкладок
-  useEffect(() => {
-    if (isAuthenticated) {
-      if (activeTab === 'editor') {
-        loadFileContent(currentFile);
-      } else if (activeTab === 'leads') {
-        loadLeadsData();
-      }
-    }
-  }, [currentFile, isAuthenticated, activeTab]);
-
-  // Сохранение изменений в редакторе JSON
+  // 4. Исправленное сохранение JSON (убрали localhost:5002)
   const handleSave = async () => {
     try {
       const parsedData = JSON.parse(jsonContent);
 
-      const response = await fetch('http://localhost:5002/api/save-json', {
+      const response = await fetch('/api/save-json', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -125,12 +111,12 @@ function AdminPanel() {
 
       const result = await response.json();
       if (result.success) {
-        showStatus('Изменения успешно сохранены в файл!', 'success');
+        showStatus('Изменения успешно сохранены!', 'success');
       } else {
         showStatus('Ошибка сервера при сохранении', 'error');
       }
     } catch (err) {
-      showStatus('Ошибка: Невалидный синтаксис JSON! Проверь запятые и кавычки.', 'error');
+      showStatus('Ошибка: Невалидный синтаксис JSON!', 'error');
     }
   };
 
